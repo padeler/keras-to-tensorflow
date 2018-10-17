@@ -35,7 +35,15 @@ import tensorflow as tf
 from keras.models import load_model
 from keras import backend as K
 
+from keras.applications.mobilenet import DepthwiseConv2D
 
+
+
+def relu6(x):
+    return K.relu(x, max_value=6)
+
+def LeakyReLU6(x):
+    return K.relu(x, alpha=0.01, max_value=6)
 
 
 def convertGraph( modelPath, outdir, numoutputs, prefix, name):
@@ -58,7 +66,7 @@ def convertGraph( modelPath, outdir, numoutputs, prefix, name):
 
     K.set_learning_phase(0)
 
-    net_model = load_model(modelPath)
+    net_model = load_model(modelPath, custom_objects={"relu6":relu6, "DepthwiseConv2D": DepthwiseConv2D, "LeakyReLU6": LeakyReLU6})
 
     # Alias the outputs in the model - this sometimes makes them easier to access in TF
     pred = [None]*numoutputs
